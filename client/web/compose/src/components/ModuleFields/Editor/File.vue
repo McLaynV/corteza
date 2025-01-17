@@ -32,7 +32,7 @@
       </div>
     </template>
 
-    <div class="d-flex justify-content-between gap-3">
+    <div class="d-flex justify-content-between gap-1">
       <uploader
         ref="uploader"
         :endpoint="endpoint"
@@ -45,7 +45,7 @@
 
       <b-button
         variant="light"
-        class="d-flex align-items-center gap-1"
+        class="d-flex align-items-center"
         @click="openCamera"
       >
         <font-awesome-icon
@@ -68,27 +68,24 @@
     <b-modal
       ref="modal"
       size="lg"
-      modal-class="video-modal-width"
+      centered
       :title="$t('editor.file.webcam.title')"
-      ok-only
-      ok-title="Close"
       body-class="d-flex flex-column align-items-center"
-      @ok="closeCamera"
-      @show="initializeWebcam"
     >
-      <video
-        ref="video"
-        width="640"
-        height="480"
-        autoplay
-        style="display:none;"
+      <b-spinner
+        v-show="processingWebcam"
+        variant="primary"
       />
-      <canvas
-        ref="canvas"
-        width="640"
-        height="480"
-        style="display:none;"
-      />
+
+      <div
+        v-show="!processingWebcam"
+        class="embed-responsive embed-responsive-4by3"
+      >
+        <video
+          ref="video"
+          autoplay
+        />
+      </div>
       <template #modal-footer>
         <div class="d-flex align-items-center gap-2">
           <b-button
@@ -100,22 +97,12 @@
           </b-button>
 
           <b-button
-            v-if="!hasCapturedImage"
-            ref="captureButton"
-            style="display:none;"
             variant="primary"
-            @click="capturePhoto"
+            @click="() => (hasCapturedImage ? uploadCapturedImage() : capturePhoto())"
           >
-            {{ $t('editor.file.webcam.buttons.capture') }}
-          </b-button>
-          <b-button
-            v-if="hasCapturedImage"
-            ref="uploadButton"
-            variant="primary"
-            style="display:none;"
-            @click="uploadCapturedImage"
-          >
-            {{ $t('editor.file.webcam.buttons.confirm') }}
+            {{ hasCapturedImage
+              ? $t('editor.file.webcam.buttons.confirm')
+              : $t('editor.file.webcam.buttons.capture') }}
           </b-button>
         </div>
       </template>
@@ -144,10 +131,10 @@ export default {
   data () {
     return {
       video: null,
-      canvas: null,
       stream: null,
       capturedImage: null,
       hasCapturedImage: false,
+      processingWebcam: true,
     }
   },
 
@@ -215,12 +202,6 @@ export default {
     async initializeWebcam () {
       await this.$nextTick()
 
-      this.video = this.$refs.video
-      this.canvas = this.$refs.canvas
-      this.captureButton = this.$refs.captureButton
-      this.uploadButton = this.$refs.uploadButton
-      this.closeButton = this.$refs.closeButton
-
       this.startWebcam()
     },
 
@@ -229,15 +210,9 @@ export default {
       navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => {
           this.stream = stream
-          this.video.srcObject = stream
-          this.video.style.display = 'block'
-          this.closeButton.style.display = 'inline-block'
+          this.$refs.video.srcObject = stream
 
-          if (this.hasCapturedImage) {
-            this.uploadButton.style.display = 'inline-block'
-          } else {
-            this.captureButton.style.display = 'inline-block'
-          }
+          this.processingWebcam = false
         })
         .catch(err => {
           console.error('Error accessing the camera: ' + err)
@@ -246,6 +221,8 @@ export default {
 
     openCamera () {
       this.$refs.modal.show()
+
+      this.initializeWebcam()
     },
     capturePhoto () {
       const video = this.$refs.video
@@ -265,7 +242,8 @@ export default {
         fetch(this.capturedImage)
           .then(res => res.blob())
           .then(blob => {
-            const file = new File([blob], 'webcam-image.jpg', { type: 'image/jpeg' })
+            const imageSuffix = new Date().toISOString().replace(/[:.]/g, '-')
+            const file = new File([blob], `webcam-image-${imageSuffix}.jpg`, { type: 'image/jpeg' })
 
             const uploader = this.$refs.uploader
             uploader.$refs.dropzone.addFile(file)
@@ -294,10 +272,3 @@ export default {
   },
 }
 </script>
-
-<style>
-.video-modal-width .modal-dialog {
-  max-width: 700px;
-  width: 100%;
-}
-</style>

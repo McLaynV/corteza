@@ -180,11 +180,11 @@ editor:
   unsavedChanges:  Unsaved changes will be lost. Do you wish to leave the page?
   file:
     webcam:
-      title: Capture image
+      title: Capture Photo
       buttons:
         cancel: Cancel
         capture: Capture photo
-        confirm: Confirm
+        confirm: Upload photo
 record:
   unsavedChanges:  Unsaved changes will be lost. Do you wish to close the record?
 
