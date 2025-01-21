@@ -32,7 +32,7 @@
       </div>
     </template>
 
-    <div class="d-flex justify-content-between gap-1">
+    <div :class="{'d-flex justify-content-between gap-1': field.options.enableWebcam}">
       <uploader
         ref="uploader"
         :endpoint="endpoint"
@@ -44,6 +44,7 @@
       />
 
       <b-button
+        v-if="field.options.enableWebcam"
         variant="light"
         class="d-flex align-items-center"
         @click="openCamera"
@@ -206,6 +207,7 @@ export default {
     },
 
     startWebcam () {
+      console.log(this.field.options)
       // Get access to the camera
       navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => {

@@ -25,6 +25,19 @@
     </b-form-group>
 
     <b-form-group
+      :label="$t('kind.file.view.enableWebcamLabel')"
+      :description="$t('kind.file.view.enableWebcamFootnote')"
+      label-class="text-primary"
+      class="mt-2"
+    >
+      <b-form-checkbox
+        v-model="f.options.enableWebcam"
+      >
+        {{ $t('kind.file.view.enableWebcam') }}
+      </b-form-checkbox>
+    </b-form-group>
+
+    <b-form-group
       :description="$t('kind.file.view.modeFootnote')"
       :label="$t('kind.file.view.modeLabel')"
       label-class="text-primary"
