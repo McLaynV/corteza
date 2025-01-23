@@ -99,4 +99,9 @@ export {
   CFormTableWrapper,
 } from './wrapper'
 
+export {
+  CWebcamButton,
+  CWebcamModal,
+} from './webcam'
+
 export { default as C3 } from './c3'

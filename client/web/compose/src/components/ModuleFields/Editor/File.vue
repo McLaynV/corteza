@@ -43,17 +43,17 @@
         @uploaded="appendAttachment"
       />
 
-      <b-button
-        v-if="field.options.enableWebcam"
-        variant="light"
-        class="d-flex align-items-center"
-        @click="openCamera"
+      <c-webcam-button
+        :webcam-enabled="field.options.enableWebcam"
+        @openWebcamModal="openWebCamModal"
       >
-        <font-awesome-icon
-          class="text-primary"
-          :icon="['fas', 'camera']"
-        />
-      </b-button>
+        <template #camera-icon>
+          <font-awesome-icon
+            class="text-primary"
+            :icon="['fas', 'camera']"
+          />
+        </template>
+      </c-webcam-button>
     </div>
 
     <list-loader
@@ -66,48 +66,13 @@
       class="mt-2"
     />
 
-    <b-modal
-      ref="modal"
-      size="lg"
-      centered
-      :title="$t('editor.file.webcam.title')"
-      body-class="d-flex flex-column align-items-center"
-    >
-      <b-spinner
-        v-show="processingWebcam"
-        variant="primary"
-      />
-
-      <div
-        v-show="!processingWebcam"
-        class="embed-responsive embed-responsive-4by3"
-      >
-        <video
-          ref="video"
-          autoplay
-        />
-      </div>
-      <template #modal-footer>
-        <div class="d-flex align-items-center gap-2">
-          <b-button
-            ref="closeButton"
-            variant="light"
-            @click="closeCamera"
-          >
-            {{ $t('editor.file.webcam.buttons.cancel') }}
-          </b-button>
-
-          <b-button
-            variant="primary"
-            @click="() => (hasCapturedImage ? uploadCapturedImage() : capturePhoto())"
-          >
-            {{ hasCapturedImage
-              ? $t('editor.file.webcam.buttons.confirm')
-              : $t('editor.file.webcam.buttons.capture') }}
-          </b-button>
-        </div>
-      </template>
-    </b-modal>
+    <c-webcam-modal
+      ref="webcam"
+      :modal-title="$t('editor.file.webcam.title')"
+      :cancel-button-label="$t('editor.file.webcam.buttons.cancel')"
+      :confirm-button-label="$t('editor.file.webcam.buttons.confirm')"
+      :capture-button-label="$t('editor.file.webcam.buttons.capture') "
+    />
     <errors :errors="errors" />
   </b-form-group>
 </template>
@@ -128,16 +93,6 @@ export default {
   },
 
   extends: base,
-
-  data () {
-    return {
-      video: null,
-      stream: null,
-      capturedImage: null,
-      hasCapturedImage: false,
-      processingWebcam: true,
-    }
-  },
 
   computed: {
     endpoint () {
@@ -200,76 +155,9 @@ export default {
         this.value = attachmentID
       }
     },
-    async initializeWebcam () {
-      await this.$nextTick()
 
-      this.startWebcam()
-    },
-
-    startWebcam () {
-      console.log(this.field.options)
-      // Get access to the camera
-      navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
-          this.stream = stream
-          this.$refs.video.srcObject = stream
-
-          this.processingWebcam = false
-        })
-        .catch(err => {
-          console.error('Error accessing the camera: ' + err)
-        })
-    },
-
-    openCamera () {
-      this.$refs.modal.show()
-
-      this.initializeWebcam()
-    },
-    capturePhoto () {
-      const video = this.$refs.video
-      const canvas = document.createElement('canvas')
-      canvas.width = video.videoWidth
-      canvas.height = video.videoHeight
-      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height)
-
-      this.capturedImage = canvas.toDataURL('image/jpeg')
-      this.hasCapturedImage = true
-
-      this.stopWebcam()
-    },
-
-    uploadCapturedImage () {
-      if (this.capturedImage) {
-        fetch(this.capturedImage)
-          .then(res => res.blob())
-          .then(blob => {
-            const imageSuffix = new Date().toISOString().replace(/[:.]/g, '-')
-            const file = new File([blob], `webcam-image-${imageSuffix}.jpg`, { type: 'image/jpeg' })
-
-            const uploader = this.$refs.uploader
-            uploader.$refs.dropzone.addFile(file)
-          })
-
-        this.$refs.modal.hide()
-      }
-    },
-
-    stopWebcam () {
-      if (this.stream) {
-        this.stream.getTracks().forEach(track => track.stop())
-      }
-    },
-    closeCamera () {
-      if (this.hasCapturedImage) {
-        this.capturedImage = null
-        this.hasCapturedImage = false
-
-        this.startWebcam()
-      } else {
-        this.stopWebcam()
-        this.$refs.modal.hide()
-      }
+    openWebCamModal () {
+      this.$refs.webcam.$refs.modal.show()
     },
   },
 }
