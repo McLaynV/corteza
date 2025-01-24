@@ -4,13 +4,20 @@
     size="lg"
     centered
     :title="modalTitle"
-    body-class="d-flex flex-column align-items-center"
+    :body-class="processingWebcam ? 'd-flex flex-column align-items-center' : 'p-0'"
     @show="initializeWebcam"
   >
     <b-spinner
       v-show="processingWebcam"
       variant="primary"
     />
+
+    <div
+      v-if="showErrorMessage"
+      class="bg-danger rounded p-2 m-2 text-white"
+    >
+      {{ cameraErrorMessage }}
+    </div>
 
     <div
       v-show="!processingWebcam"
@@ -32,6 +39,7 @@
         </b-button>
 
         <b-button
+          :disabled="processingWebcam"
           variant="primary"
           @click="() => (hasCapturedImage ? uploadCapturedImage() : capturePhoto())"
         >
@@ -65,6 +73,10 @@ export default {
       type: String,
       required: true,
     },
+    cameraErrorMessage: {
+      type: String,
+      required: true,
+    },
   },
 
   data () {
@@ -74,6 +86,7 @@ export default {
       capturedImage: null,
       hasCapturedImage: false,
       processingWebcam: true,
+      showErrorMessage: false,
     }
   },
 
@@ -86,15 +99,24 @@ export default {
 
     startWebcam () {
       // Get access to the camera
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'user',
+        },
+      })
         .then(stream => {
+          this.showErrorMessage = false
+
           this.stream = stream
           this.$refs.video.srcObject = stream
 
           this.processingWebcam = false
         })
         .catch(err => {
-          console.error('Error accessing the camera: ' + err)
+          console.error('Error accessing the camera:', err)
+
+          this.showErrorMessage = true
+          this.processingWebcam = false
         })
     },
 

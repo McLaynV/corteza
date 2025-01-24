@@ -185,6 +185,8 @@ editor:
         cancel: Cancel
         capture: Capture photo
         confirm: Upload photo
+      errors: 
+        camera: Unable to access the camera. Please make sure you have granted camera permissions.
 record:
   unsavedChanges:  Unsaved changes will be lost. Do you wish to close the record?
 

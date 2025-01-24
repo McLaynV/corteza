@@ -44,7 +44,7 @@
       />
 
       <c-webcam-button
-        :webcam-enabled="field.options.enableWebcam"
+        v-if="field.options.enableWebcam"
         @openWebcamModal="openWebCamModal"
       >
         <template #camera-icon>
@@ -71,7 +71,8 @@
       :modal-title="$t('editor.file.webcam.title')"
       :cancel-button-label="$t('editor.file.webcam.buttons.cancel')"
       :confirm-button-label="$t('editor.file.webcam.buttons.confirm')"
-      :capture-button-label="$t('editor.file.webcam.buttons.capture') "
+      :capture-button-label="$t('editor.file.webcam.buttons.capture')"
+      :camera-error-message="$t('editor.file.webcam.errors.camera')"
     />
     <errors :errors="errors" />
   </b-form-group>

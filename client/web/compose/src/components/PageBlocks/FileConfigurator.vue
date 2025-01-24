@@ -36,13 +36,27 @@
         {{ $t('kind.file.view.enableDownload') }}
       </b-form-checkbox>
     </b-form-group>
+    <div class="d-flex justify-content-between gap-1">
+      <uploader
+        :endpoint="endpoint"
+        :max-filesize="$s('compose.Page.Attachments.MaxSize', 100)"
+        :accepted-files="$s('compose.Page.Attachments.Mimetypes', ['*/*'])"
+        class="flex-grow-1"
+        @uploaded="appendAttachment"
+      />
 
-    <uploader
-      :endpoint="endpoint"
-      :max-filesize="$s('compose.Page.Attachments.MaxSize', 100)"
-      :accepted-files="$s('compose.Page.Attachments.Mimetypes', ['*/*'])"
-      @uploaded="appendAttachment"
-    />
+      <c-webcam-button
+        @openWebcamModal="openWebCamModal"
+      >
+        <template #camera-icon>
+          <font-awesome-icon
+            class="text-primary"
+            :icon="['fas', 'camera']"
+          />
+        </template>
+      </c-webcam-button>
+    </div>
+
     <list-loader
       kind="page"
       enable-delete
@@ -50,6 +64,15 @@
       :set.sync="options.attachments"
       mode="list"
       class="mt-2"
+    />
+
+    <c-webcam-modal
+      ref="webcam"
+      :modal-title="$t('general:editor.file.webcam.title')"
+      :cancel-button-label="$t('general:editor.file.webcam.buttons.cancel')"
+      :confirm-button-label="$t('general:editor.file.webcam.buttons.confirm')"
+      :capture-button-label="$t('general:editor.file.webcam.buttons.capture')"
+      :camera-error-message="$t('general:editor.file.webcam.errors.camera')"
     />
 
     <template v-if="enablePreviewStyling">
@@ -238,6 +261,10 @@ export default {
   methods: {
     appendAttachment ({ attachmentID } = {}) {
       this.options.attachments.push(attachmentID)
+    },
+
+    openWebCamModal () {
+      this.$refs.webcam.$refs.modal.show()
     },
   },
 }
