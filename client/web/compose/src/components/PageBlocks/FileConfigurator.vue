@@ -45,16 +45,26 @@
         @uploaded="appendAttachment"
       />
 
-      <c-webcam-button
+      <c-webcam
+        ref="webcam"
+        button-class="d-flex align-items-center"
+        :labels="{
+          tooltip: $t('general:webcam.tooltip'),
+          modalTitle: $t('general:webcam.title'),
+          cancelButtonLabel: $t('general:webcam.buttons.cancel'),
+          confirmButtonLabel: $t('general:webcam.buttons.confirm'),
+          captureButtonLabel: $t('general:webcam.buttons.capture'),
+          cameraErrorMessage: $t('general:webcam.errors.camera')
+        }"
         @openWebcamModal="openWebCamModal"
       >
-        <template #camera-icon>
+        <template>
           <font-awesome-icon
-            class="text-primary"
+            class="text-primary p-2"
             :icon="['fas', 'camera']"
           />
         </template>
-      </c-webcam-button>
+      </c-webcam>
     </div>
 
     <list-loader
@@ -64,15 +74,6 @@
       :set.sync="options.attachments"
       mode="list"
       class="mt-2"
-    />
-
-    <c-webcam-modal
-      ref="webcam"
-      :modal-title="$t('general:editor.file.webcam.title')"
-      :cancel-button-label="$t('general:editor.file.webcam.buttons.cancel')"
-      :confirm-button-label="$t('general:editor.file.webcam.buttons.confirm')"
-      :capture-button-label="$t('general:editor.file.webcam.buttons.capture')"
-      :camera-error-message="$t('general:editor.file.webcam.errors.camera')"
     />
 
     <template v-if="enablePreviewStyling">

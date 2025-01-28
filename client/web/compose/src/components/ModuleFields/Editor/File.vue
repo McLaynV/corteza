@@ -43,17 +43,28 @@
         @uploaded="appendAttachment"
       />
 
-      <c-webcam-button
+      <c-webcam
         v-if="field.options.enableWebcam"
+        ref="webcam"
+        button-class="d-flex align-items-center"
+        :labels="{
+          tooltip: $t('webcam.tooltip'),
+          modalTitle: $t('webcam.title'),
+          cancelButtonLabel: $t('webcam.buttons.cancel'),
+          confirmButtonLabel: $t('webcam.buttons.confirm'),
+          captureButtonLabel: $t('webcam.buttons.capture'),
+          cameraErrorMessage: $t('webcam.errors.camera')
+        }"
         @openWebcamModal="openWebCamModal"
+        @uploaded="uploadWebcamImage"
       >
-        <template #camera-icon>
+        <template>
           <font-awesome-icon
-            class="text-primary"
+            class="text-primary p-2"
             :icon="['fas', 'camera']"
           />
         </template>
-      </c-webcam-button>
+      </c-webcam>
     </div>
 
     <list-loader
@@ -64,15 +75,6 @@
       enable-delete
       mode="list"
       class="mt-2"
-    />
-
-    <c-webcam-modal
-      ref="webcam"
-      :modal-title="$t('editor.file.webcam.title')"
-      :cancel-button-label="$t('editor.file.webcam.buttons.cancel')"
-      :confirm-button-label="$t('editor.file.webcam.buttons.confirm')"
-      :capture-button-label="$t('editor.file.webcam.buttons.capture')"
-      :camera-error-message="$t('editor.file.webcam.errors.camera')"
     />
     <errors :errors="errors" />
   </b-form-group>
@@ -159,6 +161,11 @@ export default {
 
     openWebCamModal () {
       this.$refs.webcam.$refs.modal.show()
+    },
+
+    uploadWebcamImage (file) {
+      const uploader = this.$refs.uploader
+      uploader.$refs.dropzone.addFile(file)
     },
   },
 }

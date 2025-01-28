@@ -100,8 +100,7 @@ export {
 } from './wrapper'
 
 export {
-  CWebcamButton,
-  CWebcamModal,
+  CWebcam,
 } from './webcam'
 
 export { default as C3 } from './c3'

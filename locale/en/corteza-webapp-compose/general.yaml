@@ -178,15 +178,16 @@ variants:
   warning: Warning
 editor:
   unsavedChanges:  Unsaved changes will be lost. Do you wish to leave the page?
-  file:
-    webcam:
-      title: Capture Photo
-      buttons:
-        cancel: Cancel
-        capture: Capture photo
-        confirm: Upload photo
-      errors: 
-        camera: Unable to access the camera. Please make sure you have granted camera permissions.
+webcam:
+  title: Capture Photo
+  tooltip: Open webcam to capture photo
+  buttons:
+    cancel: Cancel
+    capture: Capture photo
+    confirm: Upload photo
+  errors: 
+    camera: Unable to access the camera. Please make sure you have granted camera permissions.
+
 record:
   unsavedChanges:  Unsaved changes will be lost. Do you wish to close the record?
 
